@@ -18,7 +18,6 @@ import {boldFont, fontSizes, mediumFont} from '../../assets/Fonts/font';
 import {CheckIcon, CloseIcon, NativeBaseProvider} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
 
-
 const QuizeText = () => {
   const {width} = useWindowDimensions();
   const Navigation = useNavigation();
@@ -29,7 +28,6 @@ const QuizeText = () => {
   const handleClick = () => {
     Navigation.navigate('WinnerQuize');
   };
-
 
   return (
     <SafeAreaView style={{marginBottom: 230}}>
@@ -42,9 +40,11 @@ const QuizeText = () => {
           <Text style={styles.banner_text}>Start Quize</Text>
         </View>
         <View style={styles.question}>
-          <Text style={styles.text_question}>1/10</Text>
-          <Text style={styles.text_question}>Quize Question</Text>
-          <Text></Text>
+          <Text style={styles.text_question}> 1/10 </Text>
+          <Text style={styles.text_question}> Quize Question </Text>
+          <Text style={styles.text_question}>
+            <Text style={{color: theme.colors.green}}>(6)</Text> user Add
+          </Text>
         </View>
       </View>
       <ScrollView>
@@ -154,13 +154,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     padding: 6,
     borderRadius: 30,
-    paddingLeft: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
     elevation: 5,
     marginTop: 20,
   },
   text_question: {
     color: theme.colors.black,
-    fontSize: fontSizes.x_medium,
+    fontSize: 16,
     fontWeight: mediumFont.fontWeight,
   },
   slider: {
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderBottomRightRadius: 30,
     paddingTop: 40,
-    elevation:5
+    elevation: 5,
   },
   questions: {
     width: 40,

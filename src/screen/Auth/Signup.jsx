@@ -7,28 +7,72 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import theme from '../../common/Theme';
 import login from '../../assets/icons/login.png';
 import {boldFont, fontSizes, regularFont} from '../../assets/Fonts/font';
-import {Input, NativeBaseProvider, Pressable, Stack} from 'native-base';
+import {
+  Center,
+  Input,
+  NativeBaseProvider,
+  Stack,
+  Select,
+  Box,
+  CheckIcon,
+} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
-import lock from '../../assets/icons/lock.png';
-import email from '../../assets/icons/email.png';
-import eye from '../../assets/icons/eye.png';
+import emailIcon from '../../assets/icons/email.png';
+import nameIcon from '../../assets/icons/nameIcon.png';
+import telephone from '../../assets/icons/telephone.png';
+import genderIcon from '../../assets/icons/gender.png';
 import LinearGradient from 'react-native-linear-gradient';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
 
 const Signup = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Full Name is required'),
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    phone: Yup.string()
+      .matches(/^[0-9]+$/, 'Must be only digits')
+      .min(11, 'Must be at least 11 characters')
+      .max(15, 'Must not exceed 15 characters')
+      .required('Phone number is required'),
+    // gender: Yup.string().required('Gender is required'),
+  });
+  const [gender, setGender] = useState('');
   const Navigation = useNavigation();
   const handlepress = () => {
     Navigation.navigate('Login');
   };
-  const handleSubmit =()=>{
-    Navigation.navigate('Login');
-  }
+  const handleGenderChange = itemValue => {
+    console.log(itemValue);
+    setGender(itemValue);
+  };
+
+  const handleSubmit = values => {
+    const payload={
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      gender: gender,
+    }
+    console.log(payload);
+    axios.post('https://sus-api.mangocoders.com/api/mobile/signup', payload)
+      .then(res => {
+        console.log(res.data);
+        // if (res.data === ) {
+          Alert.alert('Signup successful!');
+          Navigation.navigate('Login');
+        // } else {
+          Alert.alert('Signup failed', JSON.stringify(res.data));
+        // }
+      })
+      .catch(err => console.log(err.response));
+  };
   return (
     <NativeBaseProvider>
       <SafeAreaView>
@@ -48,76 +92,119 @@ const Signup = () => {
                 </View>
               </View>
             </LinearGradient>
-            <View style={styles.card}>
-              <Stack space={4} w="100%" alignItems="center">
-                <Input
-                  placeholder="Email-address"
-                  keyboardType="email-address"
-                  InputLeftElement={
-                    <Image source={email} style={styles.email} />
-                  }
-                />
-                <Input
-                  type={showPassword ? 'text' : 'password'}
-                  InputLeftElement={
-                    <Image source={lock} style={styles.email} />
-                  }
-                  InputRightElement={
-                    <Pressable onPress={() => setShowPassword(!showPassword)}>
-                      <Image
-                        source={eye}
-                        style={[styles.eye, showPassword && styles.crossedEye]}
-                        name={showPassword ? 'visibility' : 'visibility-off'}
-                      />
-                    </Pressable>
-                  }
-                  placeholder="Password"
-                />
+            <Formik
+              initialValues={{
+                name: '',
+                email: '',
+                phone: '',
+                gender: '',
+              }}
+              validationSchema={validationSchema}
+              onSubmit={values => handleSubmit(values)}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <View style={styles.card}>
+                  <Stack space={4} w="100%" alignItems="center">
+                    <Input
+                      placeholder="Full Name"
+                      onChangeText={handleChange('name')}
+                      onBlur={handleBlur('name')}
+                      value={values.name}
+                      InputLeftElement={
+                        <Image source={nameIcon} style={styles.fieldIcons} />
+                      }
+                    />
+                    {errors.name && touched.name && (
+                      <Text style={styles.validation}>{errors.name}</Text>
+                    )}
 
-                <Input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  InputLeftElement={
-                    <Image source={lock} style={styles.email} />
-                  }
-                  InputRightElement={
-                    <Pressable
-                      onPress={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }>
-                      <Image
-                        source={eye}
-                        style={[
-                          styles.eye,
-                          showConfirmPassword && styles.crossedEye,
-                        ]}
-                        name={
-                          showConfirmPassword ? 'visibility' : 'visibility-off'
-                        }
-                      />
-                    </Pressable>
-                  }
-                  placeholder="Confirm Password"
-                />
-              </Stack>
-              <TouchableOpacity onPress={handleSubmit}>
-              <View style={styles.login_btn}>
-                <Text style={styles.login_txt}>Sign Up</Text>
-              </View>
-              </TouchableOpacity>
-              <View>
-                <Text style={styles.heading}>
-                  Already have an account?{' '}
-                  <Text
-                    style={{
-                      color: theme.colors.green,
-                      textDecorationLine: 'underline',
-                    }}
-                    onPress={handlepress}>
-                    Login
-                  </Text>
-                </Text>
-              </View>
-            </View>
+                    <Input
+                      placeholder="Email-address"
+                      keyboardType="email-address"
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                      value={values.email}
+                      InputLeftElement={
+                        <Image source={emailIcon} style={styles.fieldIcons} />
+                      }
+                    />
+                    {errors.email && touched.email && (
+                      <Text style={styles.validation}>{errors.email}</Text>
+                    )}
+
+                    <Input
+                      placeholder="Phone Number"
+                      keyboardType="phone-pad"
+                      onChangeText={handleChange('phone')}
+                      onBlur={handleBlur('phone')}
+                      value={values.phone}
+                      InputLeftElement={
+                        <Image source={telephone} style={styles.fieldIcons} />
+                      }
+                    />
+                    {errors.phone && touched.phone && (
+                      <Text style={styles.validation}>
+                        {errors.phone}
+                      </Text>
+                    )}
+
+                    <Center>
+                      <Box>
+                        <Select
+                          selectedValue={gender}
+                          minWidth={'100%'}
+                          placeholder="Choose Gender"
+                          _selectedItem={{
+                            bg: 'teal.600',
+                            endIcon: <CheckIcon size="4" />,
+                          }}
+                          InputLeftElement={
+                            <Image
+                              source={genderIcon}
+                              style={{width: 28, height: 28, marginLeft: 10}}
+                            />
+                          }
+                          onValueChange={handleGenderChange}>
+                          <Select.Item label="Male" value="male" />
+                          <Select.Item label="Female" value="female" />
+                          <Select.Item label="Other" value="other" />
+                        </Select>
+                        {/* {errors.gender && touched.gender && !genders && (
+                          <Text style={styles.gendervalidation}>
+                            {errors.gender}
+                          </Text>
+                        )} */}
+                      </Box>
+                    </Center>
+                  </Stack>
+                  <TouchableOpacity onPress={handleSubmit}>
+                    <View style={styles.login_btn}>
+                      <Text style={styles.login_txt}>Login</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <View>
+                    <Text style={styles.heading}>
+                      Already have an account?{' '}
+                      <Text
+                        style={{
+                          color: theme.colors.green,
+                          textDecorationLine: 'underline',
+                        }}
+                        onPress={handlepress}>
+                        Login
+                      </Text>
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </Formik>
+
             <View style={styles.term_condition}>
               <Text style={styles.condition}>
                 By signing Up/Logging in, you'r agree to our
@@ -174,10 +261,12 @@ const styles = StyleSheet.create({
     padding: 30,
     elevation: 5,
   },
-  email: {
+  email: {},
+  fieldIcons: {
     width: 27,
     height: 27,
     marginLeft: 10,
+    resizeMode: 'stretch',
   },
   login_btn: {
     backgroundColor: theme.colors.green,
@@ -186,7 +275,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    marginTop: 35,
+    marginTop: 25,
   },
   login_txt: {
     color: theme.colors.white,
@@ -197,7 +286,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: fontSizes.medium,
     fontWeight: regularFont.fontWeight,
-    marginTop: 25,
+    marginTop: 20,
     color: theme.colors.black,
   },
   eye: {
@@ -212,7 +301,7 @@ const styles = StyleSheet.create({
   term_condition: {
     alignSelf: 'center',
     width: '90%',
-    marginTop: 400,
+    marginTop: 480,
   },
   condition: {
     color: theme.colors.black,
@@ -221,5 +310,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 25,
     marginBottom: 20,
+  },
+  validation: {
+    color: 'red',
+    alignSelf: 'flex-start',
+    marginTop: -10,
+  },
+  gendervalidation: {
+    color: 'red',
+    alignSelf: 'flex-start',
+    marginTop: 5,
   },
 });

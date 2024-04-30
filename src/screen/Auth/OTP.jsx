@@ -17,7 +17,10 @@ import email from '../../assets/icons/email.png';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const OTP = () => {
+const OTP = ({route}) => {
+  // const { email, otpData } = route.params;
+  // const [otp, setOTP] = useState('');
+  // const [timer, setTimer] = useState(60);
   const {width} = useWindowDimensions();
   const Navigation = useNavigation();
   const handlepress = () => {
@@ -26,6 +29,19 @@ const OTP = () => {
   const handlesubmit = () => {
     Navigation.navigate('BottomTabs');
   };
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (timer > 0) {
+  //       setTimer(prevTimer => prevTimer - 1);
+  //     } else {
+  //       clearInterval(interval);
+  //       Navigation.navigate('BottomTabs');
+  //     }
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, [timer]);
 
   return (
     <SafeAreaView>
@@ -55,19 +71,30 @@ const OTP = () => {
 
             <View style={[styles.box_Container, {width: width / 1.2}]}>
               <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input} />
+                <TextInput placeholder="" style={styles.input}
+                 // value={otp}
+                  // onChangeText={text => setOTP(text)}
+                />
               </View>
               <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input} />
+                <TextInput placeholder="" style={styles.input}
+                 // value={otp}
+                  // onChangeText={text => setOTP(text)}
+                />
               </View>
               <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input} />
+                <TextInput placeholder="" style={styles.input} 
+                 // value={otp}
+                  // onChangeText={text => setOTP(text)}
+                />
               </View>
               <View style={styles.box}>
                 <TextInput
                   placeholder=""
                   style={styles.input}
                   keyboardType={'number-pad'}
+                  // value={otp}
+                  // onChangeText={text => setOTP(text)}
                 />
               </View>
             </View>
@@ -75,8 +102,10 @@ const OTP = () => {
             <View style={{gap: -10}}>
               <Text style={styles.heading}>Don't Receive Email? </Text>
               <Text style={styles.heading}>
-                You can resend code in{' '}
-                <Text style={{color: theme.colors.green}}>55</Text> s
+                Time remaining:{'  '}  
+                <Text style={{color: theme.colors.green}}>55
+                {/* {timer} */}
+                 </Text> seconds
               </Text>
             </View>
             <TouchableOpacity onPress={handlesubmit}>

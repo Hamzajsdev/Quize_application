@@ -9,17 +9,18 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import theme from '../../common/Theme';
 import {boldFont, fontSizes, mediumFont} from '../../assets/Fonts/font';
 import profileUser from '../../assets/images/ProfileUsers/profileUser.png';
 import userProfile2 from '../../assets/images/ProfileUsers/userProfile2.png';
+import coins from '../../assets/icons/coins.png';
 
 const FinalResult = () => {
   const {width} = useWindowDimensions();
   const [activeTab, setActiveTab] = useState('weekly');
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = tab => {
     setActiveTab(tab);
   };
   return (
@@ -42,8 +43,10 @@ const FinalResult = () => {
                 activeTab === 'weekly' && styles.activeTab,
                 {
                   backgroundColor:
-                    activeTab === 'weekly' ? theme.colors.green : theme.colors.lightGreen,
-                    width:width/4
+                    activeTab === 'weekly'
+                      ? theme.colors.green
+                      : theme.colors.lightGreen,
+                  width: width / 4,
                 },
               ]}
               onPress={() => handleTabClick('weekly')}>
@@ -55,8 +58,10 @@ const FinalResult = () => {
                 activeTab === 'monthly' && styles.activeTab,
                 {
                   backgroundColor:
-                    activeTab === 'monthly' ? theme.colors.green : theme.colors.lightGreen,
-                    width:width/4
+                    activeTab === 'monthly'
+                      ? theme.colors.green
+                      : theme.colors.lightGreen,
+                  width: width / 4,
                 },
               ]}
               onPress={() => handleTabClick('monthly')}>
@@ -68,56 +73,110 @@ const FinalResult = () => {
                 activeTab === 'country' && styles.activeTab,
                 {
                   backgroundColor:
-                    activeTab === 'country' ? theme.colors.green : theme.colors.lightGreen,
-                    width:width/4
+                    activeTab === 'country'
+                      ? theme.colors.green
+                      : theme.colors.lightGreen,
+                  width: width / 4,
                 },
               ]}
               onPress={() => handleTabClick('country')}>
               <Text style={styles.badge_text}>USA</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.crads}>
-            <View
-              style={[
-                styles.profile_header,
-                {width: width / 3.4, marginTop: 100},
-              ]}>
-              <Image source={profileUser} style={styles.profile} />
-              <Text style={styles.profile_text}>Andrew</Text>
-              <View style={styles.point_card}>
-                <Text style={styles.points}>80</Text>
+          {activeTab === 'weekly' && (
+            <View style={styles.crads}>
+              <Text style={styles.winner_text}>This Week's Winners Are</Text>
+              <View
+                style={[
+                  styles.profile_header,
+                  {width: width / 3.4, marginTop: 100},
+                ]}>
+                <Image source={profileUser} style={styles.profile} />
+                <Text style={styles.profile_text}>Andrew</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>80</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 2nd {'\n'} No</Text>
+                </View>
               </View>
-              <View style={styles.point_no}>
-                <Text style={styles.position_text}> 2nd {'\n'} No</Text>
+              <View style={[styles.profile_header, {width: width / 3.4}]}>
+                <Image source={userProfile2} style={styles.profile} />
+                <Text style={styles.profile_text}>Michel</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>100</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 1st {'\n'} No</Text>
+                </View>
+              </View>
+              <View
+                style={[
+                  styles.profile_header,
+                  {width: width / 3.4, marginTop: 100},
+                ]}>
+                <Image source={profileUser} style={styles.profile} />
+                <Text style={styles.profile_text}>Jons</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>50</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 3rd {'\n'} No</Text>
+                </View>
               </View>
             </View>
-            <View style={[styles.profile_header, {width: width / 3.4}]}>
-              <Image source={userProfile2} style={styles.profile} />
-              <Text style={styles.profile_text}>Michel</Text>
-              <View style={styles.point_card}>
-                <Text style={styles.points}>100</Text>
+          )}
+          {activeTab === 'monthly' && (
+            <View style={styles.crads}>
+              <Text style={styles.winner_text}>This Monthly Winners Are</Text>
+              <View
+                style={[
+                  styles.profile_header,
+                  {width: width / 3.4, marginTop: 100},
+                ]}>
+                <Image source={userProfile2} style={styles.profile} />
+                <Text style={styles.profile_text}>Michel</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>150</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 2nd {'\n'} No</Text>
+                </View>
               </View>
-              <View style={styles.point_no}>
-                <Text style={styles.position_text}> 1st {'\n'} No</Text>
+              <View style={[styles.profile_header, {width: width / 3.4}]}>
+                <Image source={profileUser} style={styles.profile} />
+                <Text style={styles.profile_text}>Andrew</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>300</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 1st {'\n'} No</Text>
+                </View>
+              </View>
+              <View
+                style={[
+                  styles.profile_header,
+                  {width: width / 3.4, marginTop: 100},
+                ]}>
+                <Image source={userProfile2} style={styles.profile} />
+                <Text style={styles.profile_text}>Jimmy</Text>
+                <View style={styles.point_card}>
+                  <Text style={styles.points}>130</Text>
+                  <Image source={coins} style={styles.coins} />
+                </View>
+                <View style={styles.point_no}>
+                  <Text style={styles.position_text}> 3rd {'\n'} No</Text>
+                </View>
               </View>
             </View>
-            <View
-              style={[
-                styles.profile_header,
-                {width: width / 3.4, marginTop: 100},
-              ]}>
-              <Image source={profileUser} style={styles.profile} />
-              <Text style={styles.profile_text}>Jons</Text>
-              <View style={styles.point_card}>
-                <Text style={styles.points}>50</Text>
-              </View>
-              <View style={styles.point_no}>
-                <Text style={styles.position_text}> 3rd {'\n'} No</Text>
-              </View>
-            </View>
-          </View>
+          )}
         </View>
+
         <View style={styles.Remain_content}>
           <View style={[styles.remain_user, {width: width / 1.1}]}>
             <View style={styles.main_headerContent}>
@@ -150,7 +209,7 @@ const FinalResult = () => {
                 <Text style={styles.points}>3,210</Text>
               </View>
             </View>
-            <View style={[styles.main_headerContent]}>
+            <View style={styles.main_headerContent}>
               <View style={styles.reamin_profile}>
                 <Text style={styles.points}>7</Text>
                 <Image source={userProfile2} style={styles.profile_img} />
@@ -184,7 +243,7 @@ const styles = StyleSheet.create({
   },
   banner_text: {
     color: theme.colors.green,
-    fontSize: fontSizes.x_medium,
+    fontSize: fontSizes.large,
     fontWeight: boldFont.fontWeight,
   },
   main_header: {
@@ -223,14 +282,17 @@ const styles = StyleSheet.create({
   },
   point_card: {
     backgroundColor: theme.colors.shadGreen,
-    width: 50,
+    paddingLeft: 7,
+    paddingRight: 5,
     borderRadius: 80,
-    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,
     borderColor: theme.colors.lightGreen,
     borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   profile_text: {
     color: theme.colors.green,
@@ -255,6 +317,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.shadGreen,
     marginTop: 30,
     marginBottom: 130,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   remain_user: {
     alignSelf: 'center',
@@ -291,8 +355,6 @@ const styles = StyleSheet.create({
     color: theme.colors.green,
   },
   weeklyBadge: {
-    position: 'absolute',
-    left: 14,
     backgroundColor: theme.colors.green,
     height: 40,
     borderRadius: 12,
@@ -301,8 +363,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   monthly: {
-    position: 'absolute',
-    left: 130,
     backgroundColor: theme.colors.lightGreen,
     height: 40,
     borderRadius: 12,
@@ -311,8 +371,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   country: {
-    position: 'absolute',
-    left: 245,
     backgroundColor: theme.colors.lightGreen,
     height: 40,
     borderRadius: 12,
@@ -327,7 +385,7 @@ const styles = StyleSheet.create({
   },
   badges_container: {
     backgroundColor: theme.colors.shadGreen,
-    padding: 35,
+    padding: 15,
     marginTop: 10,
     borderTopLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -335,5 +393,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: theme.colors.white,
     borderWidth: 4,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  winner_text: {
+    position: 'absolute',
+    top: 10,
+    left: 70,
+    color: theme.colors.green,
+    fontSize: fontSizes.medium,
+    fontWeight: boldFont.fontWeight,
+  },
+  coins: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
   },
 });

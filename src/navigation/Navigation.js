@@ -17,7 +17,10 @@ import InviteFriend from '../components/QuizeScreen/InviteFriend';
 import QuizeText from '../components/QuizeScreen/QuizeText';
 import FinalResult from '../components/QuizeScreen/FinalResult';
 import WinnerQuize from '../components/QuizeScreen/winnerQuize';
-import { forModalPresentationIOS } from '@react-navigation/stack/lib/typescript/src/TransitionConfigs/CardStyleInterpolators';
+import InsuranceDetail from '../components/InsuranceDetail';
+import MyPolicies from '../components/MyPolicies';
+import SignupScreen from '../screen/Dummy/SignupScreen ';
+import LoginScreen from '../screen/Dummy/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Navigation = () => {
@@ -39,6 +42,10 @@ const Navigation = () => {
         <Stack.Screen name='QuizeText' component={QuizeText} />
         <Stack.Screen name='FinalResult' component={FinalResult} />
         <Stack.Screen name='WinnerQuize' component={WinnerQuize} />
+        <Stack.Screen name='InsuranceDetail' component={InsuranceDetail} />
+        <Stack.Screen name='MyPolicies' component={MyPolicies} />
+        {/* <Stack.Screen name='SignupScreen' component={SignupScreen} />
+        <Stack.Screen name='LoginScreen' component={LoginScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

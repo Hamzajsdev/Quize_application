@@ -7,8 +7,10 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  Button,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import theme from '../../common/Theme';
 import login from '../../assets/icons/login.png';
 import email from '../../assets/icons/email.png';
@@ -16,15 +18,61 @@ import LinearGradient from 'react-native-linear-gradient';
 import {boldFont, fontSizes, regularFont} from '../../assets/Fonts/font';
 import {Input, NativeBaseProvider, Stack} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
+import {user_Login} from '../../utils/User_Api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
 
 const Login = () => {
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+  });
   const Navigation = useNavigation();
   const handlepress = () => {
     Navigation.navigate('Signup');
   };
-  const handlesubmit = () => {
-    Navigation.navigate('OTP');
+
+
+  const handleSubmit = (values) => {
+    axios.post('https://sus-api.mangocoders.com/api/mobile/login', {
+      email: 'matee.mangocoders@gmail.com',
+    })
+    .then(res => {
+      console.log(res.data);
+      if (res.data && res.data.success) {
+        Alert.alert('Login successful!');
+        Navigation.navigate('NextScreen');
+      } else {
+        Alert.alert('Login failed', JSON.stringify(res.data));
+      }
+    })
+    .catch(err => {
+      console.error('Error:', err.response);
+      Alert.alert('Login failed', 'An unexpected error occurred. Please try again later.');
+    });
   };
+   
+  // const handleSubmit =()=>{
+  //   const checkEmail = email;
+  //   if(!checkEmail){
+  //     user_Login({
+  //       email:email,
+  //     })
+  //     .then((result)=>{
+  //       console.log(result);
+  //       if(result.status ==200){
+  //         AsyncStorage.setItem('AsccessToken', result.data.token)
+  //         Navigation.navigate("OTP")
+  //       }
+  //     }).catch(err=>{
+  //       console.log(err);
+  //     })
+  //   }else{
+  //     Alert.alert(checkEmail)
+  //   }
+  // }
 
   return (
     <NativeBaseProvider>
@@ -42,36 +90,63 @@ const Login = () => {
                 </View>
               </View>
             </LinearGradient>
-
-            <View style={styles.card}>
-              <Stack space={4} w="100%" alignItems="center">
-                <Input
-                  placeholder="Email-address"
-                  keyboardType="email-address"
-                  InputLeftElement={
-                    <Image source={email} style={styles.email} />
-                  }
-                />
-              </Stack>
-              <TouchableOpacity onPress={handlesubmit}>
-                <View style={styles.login_btn}>
-                  <Text style={styles.login_txt}>Login</Text>
+             <Formik
+              initialValues={{
+                email: '',
+              }}
+              validationSchema={validationSchema}
+              onSubmit={values => handleSubmit(values)}
+              > 
+               {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                
+              }) => ( 
+                <View style={styles.card}>
+                  <Stack space={4} w="100%" alignItems="center">
+                    <Input
+                      placeholder="Email-address"
+                      keyboardType="email-address"
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                      value={values.email}
+                      InputLeftElement={
+                        <Image source={email} style={styles.fieldIcons} />
+                      }
+                    />
+                     {errors.email && touched.email && (
+                      <Text style={styles.validation}>{errors.email}</Text>
+                    )} 
+                  </Stack>
+                  <TouchableOpacity onPress={handleSubmit}>
+                    <View style={styles.login_btn}>
+                      <Text
+                        style={styles.login_txt}
+                      >
+                        Login
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <View>
+                    <Text style={styles.heading}>
+                      Dont't have an account?{' '}
+                      <Text
+                        style={{
+                          color: theme.colors.green,
+                          textDecorationLine: 'underline',
+                        }}
+                        onPress={handlepress}>
+                        Sign Up
+                      </Text>
+                    </Text>
+                  </View>
                 </View>
-              </TouchableOpacity>
-              <View>
-                <Text style={styles.heading}>
-                  Dont't have an account?{' '}
-                  <Text
-                    style={{
-                      color: theme.colors.green,
-                      textDecorationLine: 'underline',
-                    }}
-                    onPress={handlepress}>
-                    Sign Up
-                  </Text>
-                </Text>
-              </View>
-            </View>
+                )} 
+             </Formik> 
           </View>
           <View style={styles.term_condition}>
             <Text style={styles.condition}>
@@ -86,6 +161,7 @@ const Login = () => {
         </ScrollView>
       </SafeAreaView>
     </NativeBaseProvider>
+    
   );
 };
 
@@ -163,5 +239,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 25,
     marginBottom: 20,
+  },
+  fieldIcons: {
+    width: 27,
+    height: 27,
+    marginLeft: 10,
+    resizeMode: 'stretch',
+  },
+  validation: {
+    color: 'red',
+    alignSelf: 'flex-start',
+    marginTop: -10,
   },
 });

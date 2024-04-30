@@ -13,14 +13,26 @@ import { fontSizes } from '../assets/Fonts/font';
 import LoaderKit from 'react-native-loader-kit'
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainScreen = () => {
     const Navigation = useNavigation()
     useEffect(() => {
         setTimeout(() => {
             Navigation.navigate('Login')
+            // Navigation.navigate('handleGetToken')
         }, 2000);
     }, [])
+
+    // const handleGetToken = async () => {
+    //     const dataToken =  await AsyncStorage.getItem('AccessToken')
+    //     if(!dataToken){
+    //         Navigation.navigate('Login')
+    //     }else{
+    //         Navigation.navigate('BottomTabs')
+    //     }
+    // }
+
     return (
         <LinearGradient colors={['#66D4BC', '#4faa98', '#338573']} style={styles.container}>
         <SafeAreaView style={styles.container}>

@@ -51,7 +51,6 @@ const InviteFriend = () => {
               <Stack space={4} w="100%" alignItems="center">
                 <Input
                   placeholder="Search Friends, name"
-                  keyboardType="text"
                   InputLeftElement={
                     <Image source={search} style={styles.search} />
                   }
@@ -77,7 +76,7 @@ const InviteFriend = () => {
                     accessibilityLabel="checkbox"></Checkbox>
                 </View>
               </View>
-              <View style={styles.profile_quizeContent}>
+              <View style={[styles.profile_quizeContents]}>
                 <View style={styles.profile_quize}>
                   <Image source={userProfile2} style={styles.profileUser} />
                   <Text style={styles.profileUser_text}>Daryl Mukastic </Text>
@@ -224,9 +223,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  profile_quizeContents: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   header_content: {
     marginTop: 30,
     gap: 35,
+    backgroundColor:theme.colors.white,
+    padding:15,
+    borderTopLeftRadius:20,
+    borderBottomRightRadius:20
   },
   main_btn: {
     position: 'absolute',
