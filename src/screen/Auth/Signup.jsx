@@ -7,7 +7,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 import theme from '../../common/Theme';
@@ -31,15 +31,15 @@ import LinearGradient from 'react-native-linear-gradient';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
     phone: Yup.string()
       .matches(/^[0-9]+$/, 'Must be only digits')
-      .min(11, 'Must be at least 11 characters')
-      .max(15, 'Must not exceed 15 characters')
       .required('Phone number is required'),
     // gender: Yup.string().required('Gender is required'),
   });
@@ -49,29 +49,45 @@ const Signup = () => {
     Navigation.navigate('Login');
   };
   const handleGenderChange = itemValue => {
-    console.log(itemValue);
     setGender(itemValue);
   };
 
   const handleSubmit = values => {
-    const payload={
-      name: values.name,
-      email: values.email,
-      phone: values.phone,
-      gender: gender,
-    }
-    console.log(payload);
-    axios.post('https://sus-api.mangocoders.com/api/mobile/signup', payload)
+    setLoading(true);
+    const payload = {
+      'name': values.name,
+      'email': values.email,
+      'phone': values.phone,
+      'gender': gender,
+    };
+    axios
+      .post('https://sus-api.mangocoders.com/api/mobile/signup', payload)
       .then(res => {
-        console.log(res.data);
-        // if (res.data === ) {
-          Alert.alert('Signup successful!');
+        Toast.show({
+          type: 'success',
+          text1: 'User successfully SignUp',
+        });
+        setTimeout(() => {
+          setLoading(false);
           Navigation.navigate('Login');
-        // } else {
-          Alert.alert('Signup failed', JSON.stringify(res.data));
-        // }
+        }, 1500);
       })
-      .catch(err => console.log(err.response));
+      .catch(err => {
+        let errorMessage = '';
+        if (err.response && err.response.data && err.response.data.errors) {
+          const errors = err.response.data.errors;
+          if (errors.name) errorMessage += `${errors.name}`;
+          if (errors.phone) errorMessage +=  ` ${errors.phone}`; 
+          if (errors.email) errorMessage += `${errors.email}`;
+          if (errors.gender) errorMessage += `${errors.gender}`;
+        }
+        Toast.show({ 
+          type: 'error',
+          text1: errorMessage.trim(),
+        });
+        setLoading(false);
+      });
+     
   };
   return (
     <NativeBaseProvider>
@@ -80,7 +96,7 @@ const Signup = () => {
           backgroundColor={theme.colors.green}
           barStyle="light-content"
         />
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <LinearGradient
               colors={['#338573', '#66D4BC', '#4faa98']}
@@ -137,7 +153,6 @@ const Signup = () => {
                     {errors.email && touched.email && (
                       <Text style={styles.validation}>{errors.email}</Text>
                     )}
-
                     <Input
                       placeholder="Phone Number"
                       keyboardType="phone-pad"
@@ -149,11 +164,8 @@ const Signup = () => {
                       }
                     />
                     {errors.phone && touched.phone && (
-                      <Text style={styles.validation}>
-                        {errors.phone}
-                      </Text>
+                      <Text style={styles.validation}>{errors.phone}</Text>
                     )}
-
                     <Center>
                       <Box>
                         <Select
@@ -175,17 +187,22 @@ const Signup = () => {
                           <Select.Item label="Female" value="female" />
                           <Select.Item label="Other" value="other" />
                         </Select>
-                        {/* {errors.gender && touched.gender && !genders && (
+                        {errors.gender && touched.gender && !gender && (
                           <Text style={styles.gendervalidation}>
                             {errors.gender}
                           </Text>
-                        )} */}
+                        )}
+                    
                       </Box>
                     </Center>
                   </Stack>
-                  <TouchableOpacity onPress={handleSubmit}>
+                  <TouchableOpacity onPress={handleSubmit} disabled={loading}>
                     <View style={styles.login_btn}>
-                      <Text style={styles.login_txt}>Login</Text>
+                      {loading ? (
+                        <ActivityIndicator color="#ffffff" />
+                      ) : (
+                        <Text style={styles.login_txt}>SignUp</Text>
+                      )}
                     </View>
                   </TouchableOpacity>
                   <View>
@@ -204,7 +221,6 @@ const Signup = () => {
                 </View>
               )}
             </Formik>
-
             <View style={styles.term_condition}>
               <Text style={styles.condition}>
                 By signing Up/Logging in, you'r agree to our
@@ -219,6 +235,7 @@ const Signup = () => {
             </View>
           </View>
         </ScrollView>
+        <Toast autoHide={true} visibilityTime={2500} position="top" />
       </SafeAreaView>
     </NativeBaseProvider>
   );
@@ -252,7 +269,7 @@ const styles = StyleSheet.create({
   },
   card: {
     position: 'absolute',
-    top: 165,
+    top: 140,
     width: '95%',
     backgroundColor: theme.colors.white,
     borderTopLeftRadius: 30,
@@ -301,7 +318,7 @@ const styles = StyleSheet.create({
   term_condition: {
     alignSelf: 'center',
     width: '90%',
-    marginTop: 480,
+    marginTop: 475,
   },
   condition: {
     color: theme.colors.black,
@@ -314,11 +331,19 @@ const styles = StyleSheet.create({
   validation: {
     color: 'red',
     alignSelf: 'flex-start',
-    marginTop: -10,
+    marginTop: -6,
+    marginBottom: -3,
   },
   gendervalidation: {
     color: 'red',
     alignSelf: 'flex-start',
     marginTop: 5,
+  },
+  errorShow: {
+    color: 'red',
+    fontSize: fontSizes.small,
+    alignSelf: 'flex-start',
+    // marginTop: 5,
+    // marginBottom:5
   },
 });

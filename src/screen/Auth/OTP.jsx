@@ -10,39 +10,127 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import theme from '../../common/Theme';
 import {boldFont, fontSizes, regularFont} from '../../assets/Fonts/font';
-import email from '../../assets/icons/email.png';
+import emailIcons from '../../assets/icons/email.png';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
 
 const OTP = ({route}) => {
-  // const { email, otpData } = route.params;
-  // const [otp, setOTP] = useState('');
-  // const [timer, setTimer] = useState(60);
   const {width} = useWindowDimensions();
+  const [error, setError] = useState('');
   const Navigation = useNavigation();
-  const handlepress = () => {
-    Navigation.navigate('Login');
+  const [timer, setTimer] = useState(120);
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const {email} = route.params;
+  useEffect(() => {
+    inputRefs[0].current.focus();
+    startTimer();
+  }, []);
+  useEffect(() => {
+    if (otp.every(digit => digit !== '')) {
+      handleSubmit();
+    }
+  }, [otp]);
+  const startTimer = () => {
+    const startTime = new Date().getTime();
+    const maxTime = 2 * 60 * 1000;
+    const updateTimer = () => {
+      const currentTime = new Date().getTime();
+      const elapsedTime = currentTime - startTime;
+      const remainingTime = maxTime - elapsedTime;
+
+      if (remainingTime <= 0) {
+        clearInterval(intervalId);
+        setTimer(0);
+      } else {
+        setTimer(Math.ceil(remainingTime / 1000));
+      }
+
+      if (elapsedTime >= maxTime) {
+        clearInterval(intervalId);
+      }
+    };
+    updateTimer();
+    const intervalId = setInterval(updateTimer, 1000);
+    return () => clearInterval(intervalId);
   };
-  const handlesubmit = () => {
-    Navigation.navigate('BottomTabs');
+  const handleChangeText = (index, value) => {
+    if (isNaN(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value !== '') {
+      if (index < 3) {
+        inputRefs[index + 1].current.focus();
+      }
+    } 
+    else {
+      let prevFilledIndex = index - 1;
+      while (prevFilledIndex >= 0 && newOtp[prevFilledIndex] === '') {
+        prevFilledIndex--;
+      }
+      if (prevFilledIndex >= 0) {
+        inputRefs[prevFilledIndex].current.focus();
+      }
+    }
   };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (timer > 0) {
-  //       setTimer(prevTimer => prevTimer - 1);
-  //     } else {
-  //       clearInterval(interval);
-  //       Navigation.navigate('BottomTabs');
-  //     }
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, [timer]);
-
+  const handleSubmit = () => {
+    const otpValue = otp.join('');
+    axios
+      .post('https://sus-api.mangocoders.com/api/token', {otp: otpValue})
+      .then(res => {
+        Toast.show({
+          type: 'success',
+          text1: 'Successfully Login',
+        });
+        setTimeout(() => {
+          Navigation.navigate('BottomTabs');
+        }, 1000);
+      })
+      .catch(err => {
+        if (
+          err.response &&
+          err.response.data &&
+          err.response.data.errors &&
+          err.response.data.errors.otp
+        ) {
+          Toast.show({
+            type: 'error',
+            text1: 'OTP is Required',
+            text2: err.response.data.errors.otp,
+          });
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Invalid OTP',
+          });
+        }
+      });
+  };
+  const handleResends = async () => {
+    setError('');
+    try {
+      const response = await axios.post(
+        'https://sus-api.mangocoders.com/api/mobile/login',
+        {email: email},
+      );
+      Toast.show({
+        type: 'success',
+        text1: 'Generated New OTP Successfully',
+      });
+      startTimer();
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: err.response.data.message,
+      });
+    }
+  };
   return (
     <SafeAreaView>
       <StatusBar
@@ -55,14 +143,13 @@ const OTP = ({route}) => {
             colors={['#338573', '#66D4BC', '#4faa98']}
             style={styles.header}>
             <View>
-                <Text style={styles.OtpTxt}>OTP</Text>
+              <Text style={styles.OtpTxt}>OTP</Text>
             </View>
           </LinearGradient>
-
           <View style={styles.card}>
             <View style={styles.contentContain}>
               <Text style={styles.content_Heading}>You've got Email</Text>
-              <Image source={email} style={styles.mail} />
+              <Image source={emailIcons} style={styles.mail} />
             </View>
             <Text style={styles.description}>
               We have start the OTP verification code to your email address.
@@ -70,52 +157,46 @@ const OTP = ({route}) => {
             </Text>
 
             <View style={[styles.box_Container, {width: width / 1.2}]}>
-              <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input}
-                 // value={otp}
-                  // onChangeText={text => setOTP(text)}
-                />
-              </View>
-              <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input}
-                 // value={otp}
-                  // onChangeText={text => setOTP(text)}
-                />
-              </View>
-              <View style={styles.box}>
-                <TextInput placeholder="" style={styles.input} 
-                 // value={otp}
-                  // onChangeText={text => setOTP(text)}
-                />
-              </View>
-              <View style={styles.box}>
-                <TextInput
-                  placeholder=""
-                  style={styles.input}
-                  keyboardType={'number-pad'}
-                  // value={otp}
-                  // onChangeText={text => setOTP(text)}
-                />
-              </View>
+              {otp.map((digit, index) => (
+                <View style={styles.box}>
+                  <TextInput
+                    placeholder=""
+                    style={styles.input}
+                    maxLength={1}
+                    keyboardType="numeric"
+                    value={digit}
+                    onChangeText={value => handleChangeText(index, value)}
+                    key={index}
+                    ref={inputRefs[index]}
+                  />
+                </View>
+              ))}
             </View>
+            {error ? <Text style={styles.errorShow}>{error}</Text> : null}
 
             <View style={{gap: -10}}>
               <Text style={styles.heading}>Don't Receive Email? </Text>
-              <Text style={styles.heading}>
-                Time remaining:{'  '}  
-                <Text style={{color: theme.colors.green}}>55
-                {/* {timer} */}
-                 </Text> seconds
+              <Text style={styles.headingTime}>
+                <Text>Time remaining:</Text>
+                {'  '}
+                {timer > 0 ? (
+                  <Text style={{color: 'red'}}>
+                    {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}
+                    {timer % 60}
+                  </Text>
+                ) : (
+                  <Text style={[styles.ResendText, {}]} onPress={handleResends}>
+                    Resend
+                  </Text>
+                )}
+                {'  '}
+                {timer > 0 ? 'seconds' : ''}
               </Text>
             </View>
-            <TouchableOpacity onPress={handlesubmit}>
-              <View style={styles.login_btn}>
-                <Text style={styles.login_txt}>Resend</Text>
-              </View>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+      <Toast autoHide={true} visibilityTime={2500} position="top" />
     </SafeAreaView>
   );
 };
@@ -140,7 +221,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.x_large,
     fontWeight: boldFont.fontWeight,
     textAlign: 'center',
-    marginTop:35
+    marginTop: 35,
   },
   errow: {
     width: 25,
@@ -155,7 +236,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: 30,
     elevation: 5,
-    marginTop: -30,
+    marginTop: -50,
     marginBottom: 30,
   },
   mail: {
@@ -207,6 +288,15 @@ const styles = StyleSheet.create({
     fontWeight: regularFont.fontWeight,
     marginTop: 25,
     color: theme.colors.black,
+    alignItems: 'center',
+  },
+  headingTime: {
+    textAlign: 'center',
+    fontSize: fontSizes.medium,
+    fontWeight: regularFont.fontWeight,
+    marginTop: 25,
+    color: theme.colors.black,
+    alignItems: 'center',
   },
   login_btn: {
     backgroundColor: theme.colors.green,
@@ -224,7 +314,17 @@ const styles = StyleSheet.create({
   bottom_border: {
     width: '100%',
     height: 100,
-    // position:'absolute',
-    // bottom:0
+  },
+  errorShow: {
+    color: 'red',
+    fontSize: fontSizes.medium,
+    alignSelf: 'flex-start',
+    marginTop: 10,
+  },
+  ResendText: {
+    fontSize: fontSizes.medium,
+    color: theme.colors.green,
+    fontWeight: boldFont.fontWeight,
+    textDecorationLine: 'underline',
   },
 });

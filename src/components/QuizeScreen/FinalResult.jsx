@@ -15,14 +15,21 @@ import {boldFont, fontSizes, mediumFont} from '../../assets/Fonts/font';
 import profileUser from '../../assets/images/ProfileUsers/profileUser.png';
 import userProfile2 from '../../assets/images/ProfileUsers/userProfile2.png';
 import coins from '../../assets/icons/coins.png';
+import backErrow from '../../assets/icons/backErrow.png';
+import {useNavigation} from '@react-navigation/native';
 
 const FinalResult = () => {
   const {width} = useWindowDimensions();
   const [activeTab, setActiveTab] = useState('weekly');
-
+  const Navigation = useNavigation();
   const handleTabClick = tab => {
     setActiveTab(tab);
   };
+  const handleSubmit = () => {
+    Navigation.navigate('Quizes');
+  };
+
+  
   return (
     <SafeAreaView>
       <StatusBar
@@ -31,7 +38,11 @@ const FinalResult = () => {
       />
       <View style={styles.banner}>
         <View style={styles.banner_content}>
+          <TouchableOpacity onPress={handleSubmit}>
+            <Image source={backErrow} style={styles.backErrow} />
+          </TouchableOpacity>
           <Text style={styles.banner_text}>LeaderBoard</Text>
+          <Text></Text>
         </View>
       </View>
       <ScrollView>
@@ -238,7 +249,8 @@ const styles = StyleSheet.create({
   banner_content: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: 'space-between',
+    // alignSelf: 'center',
     paddingBottom: 5,
   },
   banner_text: {
@@ -319,6 +331,11 @@ const styles = StyleSheet.create({
     marginBottom: 130,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+  },
+  backErrow: {
+    width: 25,
+    height: 25,
+    resizeMode: 'stretch',
   },
   remain_user: {
     alignSelf: 'center',

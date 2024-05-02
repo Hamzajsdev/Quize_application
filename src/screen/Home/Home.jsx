@@ -9,7 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {Checkbox, NativeBaseProvider} from 'native-base';
 import {boldFont, fontSizes, mediumFont} from '../../assets/Fonts/font';
@@ -35,6 +35,7 @@ const imagSlider = [
 ];
 
 const Home = () => {
+  // const [userData, setUserData] = useState([]);
   const Navigation = useNavigation();
   const handlePress = () => {
     Navigation.navigate('Slide1');
@@ -42,7 +43,22 @@ const Home = () => {
   const handleClick = () => {
     Navigation.navigate('AllCommunity');
   };
-  
+
+  // const getUserData = async () => {
+  //   const url = 'https://fakestoreapi.com/products/1';
+  //   try {
+  //     const result = await fetch(url);
+  //     const data = await result.json();
+  //     setUserData(data);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getUserData();
+  // }, []);
+
   const {width} = useWindowDimensions();
   return (
     <SafeAreaView>
@@ -354,6 +370,25 @@ const Home = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+    // <View>
+    //   {userData ? (
+    //     <View>
+    //       <Text style={{fontSize: 25, color: 'black'}}>{userData.id}</Text>
+    //       <Text style={{fontSize: 25, color: 'black'}}>
+    //         {userData.category}
+    //       </Text>
+    //       <Text style={{fontSize: 25, color: 'black'}}>
+    //         {userData.description}
+    //       </Text>
+    //       {userData.image ? (
+    //         <Image
+    //           style={{width: 100, height: 100}}
+    //           source={{uri: userData.image}}
+    //         />
+    //       ) : null}
+    //     </View>
+    //   ) : null}
+    // </View>
   );
 };
 
