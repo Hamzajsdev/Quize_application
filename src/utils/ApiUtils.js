@@ -1,10 +1,10 @@
 import axios from "axios";
-// import 'dotenv/config';
 
-
+const baseURL = process.env.BASE_URL;
 const LoginApis = axios.create({
-  baseURL:process.env.BASE_URL,
-  responseType:'json',
-  withCredentials:true
-})
-export default LoginApis
+  baseURL: baseURL,
+  responseType: 'json',
+  withCredentials: true
+});
+
+export default LoginApis;

@@ -21,6 +21,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { user_Login } from '../../utils/User_Api';
 
 
 const Login = () => {
@@ -38,10 +39,10 @@ const Login = () => {
   };
   const handleSubmit = values => {
     setLoading(true);
-    axios
-      .post('https://sus-api.mangocoders.com/api/mobile/login', {
-        'email': values.email,
-      })
+    user_Login({
+      'email': values.email,
+    })
+
       .then(res => {
         Toast.show({
           type: 'success',

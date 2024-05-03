@@ -5,10 +5,12 @@ import {
   SafeAreaView,
   StyleSheet,
   Image,
-  TouchableOpacity,
   TextInput,
   ScrollView,
   useWindowDimensions,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import theme from '../../common/Theme';
@@ -18,6 +20,7 @@ import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import {OTPSend, User_otp} from '../../utils/User_Api';
 
 const OTP = ({route}) => {
   const {width} = useWindowDimensions();
@@ -68,13 +71,12 @@ const OTP = ({route}) => {
       if (index < 3) {
         inputRefs[index + 1].current.focus();
       }
-    } 
-    else {
+    } else {
       let prevFilledIndex = index - 1;
       while (prevFilledIndex >= 0 && newOtp[prevFilledIndex] === '') {
         prevFilledIndex--;
       }
-      if (prevFilledIndex >= 0) {
+      if (prevFilledIndex >= 0 && !isNaN(newOtp[prevFilledIndex])) {
         inputRefs[prevFilledIndex].current.focus();
       }
     }
@@ -173,24 +175,31 @@ const OTP = ({route}) => {
               ))}
             </View>
             {error ? <Text style={styles.errorShow}>{error}</Text> : null}
-
             <View style={{gap: -10}}>
               <Text style={styles.heading}>Don't Receive Email? </Text>
               <Text style={styles.headingTime}>
-                <Text>Time remaining:</Text>
-                {'  '}
+                <TouchableOpacity>
+                  <Text style={styles.headingTime}>Time remaining:</Text>
+                </TouchableOpacity>{' '}
                 {timer > 0 ? (
-                  <Text style={{color: 'red'}}>
-                    {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}
-                    {timer % 60}
-                  </Text>
+                  <TouchableOpacity>
+                    <Text style={styles.counter}>
+                      {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}
+                      {timer % 60}
+                    </Text>
+                  </TouchableOpacity>
                 ) : (
-                  <Text style={[styles.ResendText, {}]} onPress={handleResends}>
-                    Resend
-                  </Text>
+                  <TouchableOpacity onPress={handleResends}>
+                    <Text style={[styles.ResendText]}> Resend</Text>
+                  </TouchableOpacity>
+                )}{' '}
+                {timer > 0 ? (
+                  <TouchableOpacity>
+                    <Text style={styles.headingTime}>Second</Text>
+                  </TouchableOpacity>
+                ) : (
+                  ''
                 )}
-                {'  '}
-                {timer > 0 ? 'seconds' : ''}
               </Text>
             </View>
           </View>
@@ -209,6 +218,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   content: {
     flexDirection: 'row',
@@ -291,12 +303,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headingTime: {
-    textAlign: 'center',
-    fontSize: fontSizes.medium,
-    fontWeight: regularFont.fontWeight,
-    marginTop: 25,
-    color: theme.colors.black,
+    marginTop: 13,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+    alignSelf: 'center',
+    fontSize: fontSizes.medium,
+    color: theme.colors.black,
+    fontWeight: regularFont.fontWeight,
+  },
+  counter: {
+    fontSize: fontSizes.medium,
+    color: 'red',
   },
   login_btn: {
     backgroundColor: theme.colors.green,
@@ -326,5 +344,8 @@ const styles = StyleSheet.create({
     color: theme.colors.green,
     fontWeight: boldFont.fontWeight,
     textDecorationLine: 'underline',
+  },
+  clickedText: {
+    color: 'red',
   },
 });

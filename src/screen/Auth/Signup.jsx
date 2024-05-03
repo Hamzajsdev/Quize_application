@@ -32,6 +32,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { user_Signup } from '../../utils/User_Api';
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
@@ -51,8 +52,7 @@ const Signup = () => {
   const handleGenderChange = itemValue => {
     setGender(itemValue);
   };
-
-  const handleSubmit = values => {
+  const handleSubmit = async values => {
     setLoading(true);
     const payload = {
       'name': values.name,
@@ -60,35 +60,35 @@ const Signup = () => {
       'phone': values.phone,
       'gender': gender,
     };
-    axios
-      .post('https://sus-api.mangocoders.com/api/mobile/signup', payload)
-      .then(res => {
-        Toast.show({
-          type: 'success',
-          text1: 'User successfully SignUp',
-        });
-        setTimeout(() => {
-          setLoading(false);
-          Navigation.navigate('Login');
-        }, 1500);
-      })
-      .catch(err => {
-        let errorMessage = '';
-        if (err.response && err.response.data && err.response.data.errors) {
-          const errors = err.response.data.errors;
-          if (errors.name) errorMessage += `${errors.name}`;
-          if (errors.phone) errorMessage +=  ` ${errors.phone}`; 
-          if (errors.email) errorMessage += `${errors.email}`;
-          if (errors.gender) errorMessage += `${errors.gender}`;
-        }
-        Toast.show({ 
-          type: 'error',
-          text1: errorMessage.trim(),
-        });
-        setLoading(false);
+    try {
+      const response = await user_Signup(payload);
+      Toast.show({
+        type: 'success',
+        text1: 'User successfully signed up',
       });
-     
+      setTimeout(() => {
+        setLoading(false);
+        Navigation.navigate('Login');
+      }, 1500);
+    } catch (error) {
+      let errorMessage = '';
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errors = error.response.data.errors;
+        if (errors.name) errorMessage += `${errors.name}`;
+        if (errors.phone) errorMessage += `${errors.phone}`; 
+        if (errors.email) errorMessage += `${errors.email}`;
+        if (errors.gender) errorMessage += `${errors.gender}`;
+      } else {
+        errorMessage = 'An error occurred while signing up';
+      }
+      Toast.show({ 
+        type: 'error',
+        text1: errorMessage.trim(),
+      });
+      setLoading(false);
+    }
   };
+  
   return (
     <NativeBaseProvider>
       <SafeAreaView>
