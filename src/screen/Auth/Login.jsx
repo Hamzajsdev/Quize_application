@@ -21,12 +21,14 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { user_Login } from '../../utils/User_Api';
-
+import {user_Login} from '../../utils/User_Api';
+import {useDispatch} from 'react-redux';
+import setUser from '../../Store/UserSlice'
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const dispatch = useDispatch();
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email').required('Email is required'),
   });
@@ -37,13 +39,15 @@ const Login = () => {
   const handleEmailChange = () => {
     setError('');
   };
+
   const handleSubmit = values => {
     setLoading(true);
+    // dispatch(setUser(values))
     user_Login({
-      'email': values.email,
+      email: values.email,
     })
-
       .then(res => {
+        console.log(res.data);
         Toast.show({
           type: 'success',
           text1: 'Successfully',
@@ -51,111 +55,110 @@ const Login = () => {
         });
         setTimeout(() => {
           setLoading(false);
-          Navigation.navigate('OTP', { 'email': values.email });
-        }, 1000); 
+          Navigation.navigate('OTP', {email: values.email});
+        }, 1000);
+        dispatch(setUser(values));
       })
       .catch(err => {
         Toast.show({
           type: 'error',
-          text1:'Login Failed',  
-          text2: (err.response.data.errors.email)
+          text1: 'Login Failed',
+          text2: err.response.data.errors.email,
         });
         setLoading(false);
       });
-  };
-
+  };  
   return (
-      <NativeBaseProvider>
-        <SafeAreaView>
-          <StatusBar backgroundColor={'#338573'} barStyle="light-content" />
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View>
-              <LinearGradient
-                colors={['#338573', '#66D4BC', '#4faa98']}
-                style={styles.header}>
-                <View>
-                  <View style={styles.content}>
-                    <Text style={styles.loginTxt}>Login</Text>
-                    <Image source={login} style={styles.login} />
+    <NativeBaseProvider>
+      <SafeAreaView>
+        <StatusBar backgroundColor={'#338573'} barStyle="light-content" />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View>
+            <LinearGradient
+              colors={['#338573', '#66D4BC', '#4faa98']}
+              style={styles.header}>
+              <View>
+                <View style={styles.content}>
+                  <Text style={styles.loginTxt}>Login</Text>
+                  <Image source={login} style={styles.login} />
+                </View>
+              </View>
+            </LinearGradient>
+
+            <Formik
+              initialValues={{
+                email: '',
+              }}
+              validationSchema={validationSchema}
+              onSubmit={values => handleSubmit(values)}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <View style={styles.card}>
+                  <Stack space={4} w="100%" alignItems="center">
+                    <Input
+                      placeholder="Email-address"
+                      keyboardType="email-address"
+                      onChangeText={handleChange('email')}
+                      onFocus={handleEmailChange}
+                      onBlur={handleBlur('email')}
+                      value={values.email}
+                      InputLeftElement={
+                        <Image source={email} style={styles.fieldIcons} />
+                      }
+                    />
+                    {errors.email && touched.email && (
+                      <Text style={styles.validation}>{errors.email}</Text>
+                    )}
+                    {error ? (
+                      <Text style={styles.errorShow}>{error}</Text>
+                    ) : null}
+                  </Stack>
+                  <TouchableOpacity onPress={handleSubmit} disabled={loading}>
+                    <View style={styles.login_btn}>
+                      {loading ? (
+                        <ActivityIndicator color="#ffffff" />
+                      ) : (
+                        <Text style={styles.login_txt}>Login</Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                  <View>
+                    <Text style={styles.heading}>
+                      Dont't have an account?{' '}
+                      <Text
+                        style={{
+                          color: theme.colors.green,
+                          textDecorationLine: 'underline',
+                        }}
+                        onPress={handlepress}>
+                        Sign Up
+                      </Text>
+                    </Text>
                   </View>
                 </View>
-              </LinearGradient>
-
-              <Formik
-                initialValues={{
-                  email: '',
-                }}
-                validationSchema={validationSchema}
-                onSubmit={values => handleSubmit(values)}>
-                {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                  touched,
-                }) => (
-                  <View style={styles.card}>
-                    <Stack space={4} w="100%" alignItems="center">
-                      <Input
-                        placeholder="Email-address"
-                        keyboardType="email-address"
-                        onChangeText={handleChange('email')}
-                        onFocus={handleEmailChange}
-                        onBlur={handleBlur('email')}
-                        value={values.email}
-                        InputLeftElement={
-                          <Image source={email} style={styles.fieldIcons} />
-                        }
-                      />
-                      {errors.email && touched.email && (
-                        <Text style={styles.validation}>{errors.email}</Text>
-                      )}
-                      {error ? (
-                        <Text style={styles.errorShow}>{error}</Text>
-                      ) : null}
-                    </Stack>
-                    <TouchableOpacity onPress={handleSubmit} disabled={loading}>
-                      <View style={styles.login_btn}>
-                        {loading ? (
-                          <ActivityIndicator color="#ffffff" />
-                        ) : (
-                          <Text style={styles.login_txt}>Login</Text>
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    <View>
-                      <Text style={styles.heading}>
-                        Dont't have an account?{' '}
-                        <Text
-                          style={{
-                            color: theme.colors.green,
-                            textDecorationLine: 'underline',
-                          }}
-                          onPress={handlepress}>
-                          Sign Up
-                        </Text>
-                      </Text>
-                    </View>
-                  </View>
-                )}
-              </Formik>
-            </View>
-            <View style={styles.term_condition}>
-              <Text style={styles.condition}>
-                By signing Up/Logging in, you'r agree to our
-                <Text style={{color: theme.colors.green}}>
-                  {'\n'}Term of services
-                </Text>{' '}
-                and
-                <Text style={{color: theme.colors.green}}> Privacy Policy</Text>
-              </Text>
-            </View>
-          </ScrollView>
-          <Toast autoHide={true} visibilityTime={2500} position='top'  />
-
-        </SafeAreaView>
-      </NativeBaseProvider>
+              )}
+            </Formik>
+          </View>
+          <View style={styles.term_condition}>
+            <Text style={styles.condition}>
+              By signing Up/Logging in, you'r agree to our
+              <Text style={{color: theme.colors.green}}>
+                {'\n'}Term of services
+              </Text>{' '}
+              and
+              <Text style={{color: theme.colors.green}}> Privacy Policy</Text>
+            </Text>
+          </View>
+        </ScrollView>
+        <Toast autoHide={true} visibilityTime={2500} position="top" />
+      </SafeAreaView>
+    </NativeBaseProvider>
   );
 };
 

@@ -32,10 +32,15 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { user_Signup } from '../../utils/User_Api';
+import {user_Signup} from '../../utils/User_Api';
+import { useDispatch } from 'react-redux';
+ import {setUser} from '../../Store/UserSlice'
 
-const Signup = () => {
+const Signup = userData => {
   const [loading, setLoading] = useState(false);
+  const [gender, setGender] = useState('');
+  const Navigation = useNavigation();
+  const dispatch=useDispatch()
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
@@ -44,8 +49,6 @@ const Signup = () => {
       .required('Phone number is required'),
     // gender: Yup.string().required('Gender is required'),
   });
-  const [gender, setGender] = useState('');
-  const Navigation = useNavigation();
   const handlepress = () => {
     Navigation.navigate('Login');
   };
@@ -55,13 +58,16 @@ const Signup = () => {
   const handleSubmit = async values => {
     setLoading(true);
     const payload = {
-      'name': values.name,
-      'email': values.email,
-      'phone': values.phone,
-      'gender': gender,
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      gender: gender,
     };
     try {
       const response = await user_Signup(payload);
+      const userData = payload;
+      console.log("User Data:", userData);
+      dispatch(setUser(userData)); 
       Toast.show({
         type: 'success',
         text1: 'User successfully signed up',
@@ -75,20 +81,20 @@ const Signup = () => {
       if (error.response && error.response.data && error.response.data.errors) {
         const errors = error.response.data.errors;
         if (errors.name) errorMessage += `${errors.name}`;
-        if (errors.phone) errorMessage += `${errors.phone}`; 
+        if (errors.phone) errorMessage += `${errors.phone}`;
         if (errors.email) errorMessage += `${errors.email}`;
         if (errors.gender) errorMessage += `${errors.gender}`;
       } else {
         errorMessage = 'An error occurred while signing up';
       }
-      Toast.show({ 
+      Toast.show({
         type: 'error',
         text1: errorMessage.trim(),
       });
       setLoading(false);
     }
   };
-  
+
   return (
     <NativeBaseProvider>
       <SafeAreaView>
@@ -192,7 +198,6 @@ const Signup = () => {
                             {errors.gender}
                           </Text>
                         )}
-                    
                       </Box>
                     </Center>
                   </Stack>

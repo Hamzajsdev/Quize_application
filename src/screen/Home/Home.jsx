@@ -27,6 +27,8 @@ import nullflower from '../../assets/images/nullflowers.jpg';
 import Swiper from 'react-native-swiper';
 import {useNavigation} from '@react-navigation/native';
 import community from '../../assets/images/communitys.jpg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const imagSlider = [
   require('../../assets/images/insurance1.jpg'),
@@ -35,7 +37,9 @@ const imagSlider = [
 ];
 
 const Home = () => {
-  // const [userData, setUserData] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const {width} = useWindowDimensions();
+
   const Navigation = useNavigation();
   const handlePress = () => {
     Navigation.navigate('Slide1');
@@ -44,22 +48,26 @@ const Home = () => {
     Navigation.navigate('AllCommunity');
   };
 
-  // const getUserData = async () => {
-  //   const url = 'https://fakestoreapi.com/products/1';
-  //   try {
-  //     const result = await fetch(url);
-  //     const data = await result.json();
-  //     setUserData(data);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
+  const fetchData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`${process.env.BASE_URL}/api/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const userData = response.data;
+      console.log(userData);
+      setUserData(userData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // useEffect(() => {
-  //   getUserData();
-  // }, []);
-
-  const {width} = useWindowDimensions();
   return (
     <SafeAreaView>
       <StatusBar
@@ -362,33 +370,14 @@ const Home = () => {
               </View>
             </View>
             <TouchableOpacity onPress={handleClick}>
-            <View style={[styles.communit_btn, {width: width / 2}]}>
-              <Text style={styles.community_text}>View Community</Text>
-            </View>
+              <View style={[styles.communit_btn, {width: width / 2}]}>
+                <Text style={styles.community_text}>View Community</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-    // <View>
-    //   {userData ? (
-    //     <View>
-    //       <Text style={{fontSize: 25, color: 'black'}}>{userData.id}</Text>
-    //       <Text style={{fontSize: 25, color: 'black'}}>
-    //         {userData.category}
-    //       </Text>
-    //       <Text style={{fontSize: 25, color: 'black'}}>
-    //         {userData.description}
-    //       </Text>
-    //       {userData.image ? (
-    //         <Image
-    //           style={{width: 100, height: 100}}
-    //           source={{uri: userData.image}}
-    //         />
-    //       ) : null}
-    //     </View>
-    //   ) : null}
-    // </View>
   );
 };
 

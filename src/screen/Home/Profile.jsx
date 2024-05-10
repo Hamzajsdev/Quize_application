@@ -8,9 +8,10 @@ import {
   useWindowDimensions,
   ScrollView,
   TouchableOpacity,
+  Button,
 } from 'react-native';
 import {boldFont, fontSizes, mediumFont} from '../../assets/Fonts/font';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import theme from '../../common/Theme';
 import setting from '../../assets/icons/setting.png';
 import profile from '../../assets/icons/profile.png';
@@ -23,20 +24,25 @@ import pointAct from '../../assets/images/pointAct.jpg';
 import sustainSeries from '../../assets/images/sustainSeries.jpg';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser,setUser } from '../../Store/UserSlice';
+
 
 const Profile = () => {
   const {width} = useWindowDimensions();
   const Navigation = useNavigation();
+  const dispatch=useDispatch()
+  const user = useSelector(selectUser);
+  console.log(user);
   const hanldePress = () => {
     Navigation.navigate('Levels');
   };
   const hanldeSubmit = () => {
     Navigation.navigate('Setting');
   };
-
   const hanldeClick = () => {
     Navigation.navigate('AllPoints');
-  };  
+  };
 
   return (
     <SafeAreaView style={{marginBottom: 100}}>
@@ -61,6 +67,9 @@ const Profile = () => {
               <View style={styles.profile_content}>
                 <Image source={profile} style={styles.user} />
                 <Text style={[styles.name, {width: width / 3}]}>
+                {/* {user && (
+                    <Text>{user.email}</Text>
+                  )} */}
                   Muhammad Hamza
                 </Text>
               </View>
@@ -161,7 +170,7 @@ const Profile = () => {
                   <Image source={leafFlower} style={styles.leaf_icons} />
                 </View>
               </View>
-              <View style={[styles.point_content,{marginBottom:20}]}>
+              <View style={[styles.point_content, {marginBottom: 20}]}>
                 <View style={styles.missingPoing_content}>
                   <Image source={sustainSeries} style={styles.carewater} />
                   <View style={styles.waterCare_container}>
@@ -433,7 +442,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderBottomRightRadius: 50,
     gap: 50,
-    elevation:4
+    elevation: 4,
   },
   point_content: {
     flexDirection: 'row',

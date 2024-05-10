@@ -5,14 +5,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
-  useWindowDimensions,
   TouchableOpacity,
-  ActivityIndicator,
-  Animated,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import theme from '../../common/Theme';
 import {boldFont, fontSizes, regularFont} from '../../assets/Fonts/font';
 import emailIcons from '../../assets/icons/email.png';
@@ -20,25 +16,19 @@ import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import {OTPSend, User_otp} from '../../utils/User_Api';
+import OTPTextView from 'react-native-otp-textinput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OTP = ({route}) => {
-  const {width} = useWindowDimensions();
   const [error, setError] = useState('');
   const Navigation = useNavigation();
   const [timer, setTimer] = useState(120);
   const [otp, setOtp] = useState(['', '', '', '']);
-  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const {email} = route.params;
   useEffect(() => {
-    inputRefs[0].current.focus();
     startTimer();
   }, []);
-  useEffect(() => {
-    if (otp.every(digit => digit !== '')) {
-      handleSubmit();
-    }
-  }, [otp]);
+
   const startTimer = () => {
     const startTime = new Date().getTime();
     const maxTime = 2 * 60 * 1000;
@@ -62,30 +52,24 @@ const OTP = ({route}) => {
     const intervalId = setInterval(updateTimer, 1000);
     return () => clearInterval(intervalId);
   };
-  const handleChangeText = (index, value) => {
-    if (isNaN(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (value !== '') {
-      if (index < 3) {
-        inputRefs[index + 1].current.focus();
-      }
-    } else {
-      let prevFilledIndex = index - 1;
-      while (prevFilledIndex >= 0 && newOtp[prevFilledIndex] === '') {
-        prevFilledIndex--;
-      }
-      if (prevFilledIndex >= 0 && !isNaN(newOtp[prevFilledIndex])) {
-        inputRefs[prevFilledIndex].current.focus();
-      }
+  useEffect(() => {
+    if (otp.length === 4) {
+      handleSubmit();
     }
-  };
+  }, [otp]);
   const handleSubmit = () => {
-    const otpValue = otp.join('');
+    if (otp.length !== 4) {
+      return;
+    }
+    const isValidOTP = /^\d{4}$/.test(otp);
+    if (!isValidOTP) {
+      return;
+    }
     axios
-      .post('https://sus-api.mangocoders.com/api/token', {otp: otpValue})
+      .post('https://sus-api.mangocoders.com/api/token', {otp})
       .then(res => {
+        // console.log(res.data.token,'------------');
+        // AsyncStorage.setItem('token',res?.data?.token)
         Toast.show({
           type: 'success',
           text1: 'Successfully Login',
@@ -95,25 +79,13 @@ const OTP = ({route}) => {
         }, 1000);
       })
       .catch(err => {
-        if (
-          err.response &&
-          err.response.data &&
-          err.response.data.errors &&
-          err.response.data.errors.otp
-        ) {
-          Toast.show({
-            type: 'error',
-            text1: 'OTP is Required',
-            text2: err.response.data.errors.otp,
-          });
-        } else {
-          Toast.show({
-            type: 'error',
-            text1: 'Invalid OTP',
-          });
-        }
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid OTP',
+        });
       });
   };
+
   const handleResends = async () => {
     setError('');
     try {
@@ -158,21 +130,14 @@ const OTP = ({route}) => {
               Check your email and enter the code below.{' '}
             </Text>
 
-            <View style={[styles.box_Container, {width: width / 1.2}]}>
-              {otp.map((digit, index) => (
-                <View style={styles.box}>
-                  <TextInput
-                    placeholder=""
-                    style={styles.input}
-                    maxLength={1}
-                    keyboardType="numeric"
-                    value={digit}
-                    onChangeText={value => handleChangeText(index, value)}
-                    key={index}
-                    ref={inputRefs[index]}
-                  />
-                </View>
-              ))}
+            <View style={[styles.box_Container]}>
+              <OTPTextView
+                inputCount={4}
+                containerStyle={styles.textInputContainer}
+                textInputStyle={styles.roundedTextInput}
+                keyboardType="numeric"
+                handleTextChange={setOtp}
+              />
             </View>
             {error ? <Text style={styles.errorShow}>{error}</Text> : null}
             <View style={{gap: -10}}>
@@ -281,12 +246,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  box_Container: {
-    alignSelf: 'center',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    marginTop: 24,
-  },
+
   input: {
     color: theme.colors.black,
     padding: 10,
@@ -347,5 +307,20 @@ const styles = StyleSheet.create({
   },
   clickedText: {
     color: 'red',
+  },
+  textInputContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginTop: 40,
+    marginBottom: 0,
+  },
+  roundedTextInput: {
+    height: 65,
+    width: '20%',
+    color: theme.colors.lightGreen,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: theme.colors.green,
   },
 });

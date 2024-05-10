@@ -18,16 +18,18 @@ import FinalResult from '../components/QuizeScreen/FinalResult';
 import WinnerQuize from '../components/QuizeScreen/winnerQuize';
 import InsuranceDetail from '../components/InsuranceDetail';
 import MyPolicies from '../components/MyPolicies';
+import MainIndex from '../Gesture/MainIndex';
+// import CurveSwiper from '../screen/Home/CurveSwiper';
 
 const Stack = createNativeStackNavigator();
 const Navigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
+        {/* <Stack.Screen name="MainScreen" component={MainScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="OTP" component={OTP} />
         <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="MainScreen" component={MainScreen} />
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="Slide1" component={Slide1} />
         <Stack.Screen name="Levels" component={Levels} />
@@ -40,7 +42,10 @@ const Navigation = () => {
         <Stack.Screen name="FinalResult" component={FinalResult} />
         <Stack.Screen name="WinnerQuize" component={WinnerQuize} />
         <Stack.Screen name="InsuranceDetail" component={InsuranceDetail} />
-        <Stack.Screen name="MyPolicies" component={MyPolicies} />
+        <Stack.Screen name="MyPolicies" component={MyPolicies} /> */}
+        {/* <Stack.Screen name="CurveSwiper" component={CurveSwiper} /> */}
+        <Stack.Screen name="MainIndex" component={MainIndex} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
